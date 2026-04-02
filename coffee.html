@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Coffee Question ☕</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #fff5f7;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+h1 {
+    font-size: 42px;
+    color: #333;
+    margin-bottom: 40px;
+}
+
+.buttons {
+    display: flex;
+    gap: 30px;
+}
+
+button {
+    padding: 20px 40px;
+    font-size: 22px;
+    cursor: pointer;
+    border-radius: 15px;
+    border: none;
+    transition: 0.2s;
+}
+
+#yes {
+    background-color: #ff4d88;
+    color: white;
+    animation: pulse 0.8s infinite;
+    box-shadow: 0 0 20px #ff4d88, 0 0 40px #ff4d88;
+}
+
+#yes:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 30px #ff4d88, 0 0 60px #ff4d88;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+#no {
+    background-color: #ccc;
+    position: relative;
+}
+
+#timer {
+    margin-top: 30px;
+    font-size: 22px;
+    color: #666;
+}
+
+.fade {
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: 0;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<h1 id="title">Marcello, coffee with me? ☕</h1>
+
+<div class="buttons">
+    <button id="yes" onclick="yesClicked()">YES 😋</button>
+    <button id="no">NO 🙈</button>
+</div>
+
+<div id="timer">You have 30 seconds 😏</div>
+
+<script>
+const noBtn = document.getElementById("no");
+const yesBtn = document.getElementById("yes");
+const title = document.getElementById("title");
+
+let scale = 1;
+let yesScale = 1;
+let noHoverCount = 0;
+
+/* NO BUTTON BEHAVIOR */
+noBtn.addEventListener("mouseover", () => {
+    noHoverCount++;
+
+    const maxX = window.innerWidth - noBtn.offsetWidth;
+    const maxY = window.innerHeight - noBtn.offsetHeight;
+
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+
+    scale -= 0.1;
+    if (scale < 0.4) scale = 0.4;
+
+    noBtn.style.position = "absolute";
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+    noBtn.style.transform = "scale(" + scale + ")";
+
+    /* YES GETS BIGGER EACH TIME 😏 */
+    yesScale += 0.2;
+    yesBtn.style.transform = "scale(" + yesScale + ")";
+
+    /* AFTER 4 TRIES → YES JUMPS IN FRONT */
+    if (noHoverCount >= 4) {
+        yesBtn.style.position = "absolute";
+        yesBtn.style.left = x + "px";
+        yesBtn.style.top = y + "px";
+        yesBtn.style.zIndex = "10";
+
+        noHoverCount = 0;
+    }
+});
+
+/* CONFETTI */
+function createConfetti() {
+    for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+
+        confetti.style.left = Math.random() * 100 + "vw";
+        confetti.style.backgroundColor =
+            "hsl(" + Math.random() * 360 + ", 100%, 60%)";
+        confetti.style.animationDuration = (Math.random() * 2 + 2) + "s";
+
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 4000);
+    }
+}
+
+/* YES CLICK */
+function yesClicked() {
+    createConfetti();
+
+    document.body.innerHTML = `
+        <div class="fade">
+            <h1 style="font-size:48px;">YAY!! ☕😜</h1>
+            <p style="font-size:24px;">Check your email 😉</p>
+        </div>
+    `;
+
+    setTimeout(() => {
+        window.location.href =
+        "mailto:Petronellameleni01@gmail.com?subject=Coffee%20%3A)&body=Yes%20%E2%98%95%EF%B8%8F%E2%98%BA%EF%B8%8F";
+    }, 1500);
+}
+
+/* TIMER + PASSIVE PRESSURE */
+let timeLeft = 30;
+const timer = document.getElementById("timer");
+
+const countdown = setInterval(() => {
+    timeLeft--;
+
+    timer.textContent = "You have " + timeLeft + " seconds 😏";
+
+    /* TEXT CHANGES */
+    if (timeLeft === 20) {
+        title.textContent = "Okay… just hovering? 👀";
+    }
+
+    if (timeLeft === 15) {
+        title.textContent = "You know you want to say yes 😌☕";
+    }
+
+    if (timeLeft === 10) {
+        title.textContent = "Marcello… don’t overthink it 😏";
+    }
+
+    if (timeLeft === 5) {
+        title.textContent = "Last chance… 👀☕";
+    }
+
+    /* YES GROWS EVEN WITHOUT ACTION */
+    yesScale += 0.05;
+    yesBtn.style.transform = "scale(" + yesScale + ")";
+
+    /* AUTO ENDING */
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        timer.textContent = "I'll take that as a yes 😌";
+
+        setTimeout(() => {
+            yesClicked();
+        }, 1000);
+    }
+}, 1000);
+</script>
+
+</body>
+</html>
